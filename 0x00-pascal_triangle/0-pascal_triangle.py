@@ -16,7 +16,7 @@ def pascal_triangle(n):
     if n <= 0:
         return []
 
-    triangle, pas_list = [], []
+    triangle, p_list = [], []
     for x in range(n):
         if x == 0:
             triangle.append([1])
@@ -28,11 +28,11 @@ def pascal_triangle(n):
         sum_list = triangle[-1]
         for i in range(len(sum_list) + 1):
             if i in [0, len(sum_list)]:
-                pas_list.append(1)
+                p_list.append(1)
                 continue
-            pas_list.append(sum_list[i] + sum_list[i - 1])
+            p_list.append(sum_list[i] + sum_list[i - 1])
 
-        triangle.append(pas_list)
-        pas_list = []
+        triangle.append(p_list)
+        p_list = []
 
     return triangle
