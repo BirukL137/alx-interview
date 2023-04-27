@@ -18,12 +18,18 @@ def nqueens(n):
         sys.exit(1)
 
     def is_valid(board, row, col):
+        """ Validate the board with row and columns and returns boolean. """
         for r, c in board:
-            if r == row or c == col or r - c == row - col or r + c == row + col:
+            if r == row or c == col or r - c == row - col\
+                  or r + c == row + col:
                 return False
         return True
 
     def backtrack(board, row):
+        """
+        This function incrementally builds candidate to the solution
+        and abandons it, if the validation failed
+        """
         if row == n:
             print(board)
             return
@@ -35,7 +41,13 @@ def nqueens(n):
 
     backtrack([], 0)
 
+
 if __name__ == "__main__":
+    """
+    If the user called the program with the wrong number of arguments,
+    prints Usage: nqueens N, followed by a new line, and exit with the
+    status 1
+    """
     if len(sys.argv) != 2:
         print("Usage: nqueens N")
         sys.exit(1)
