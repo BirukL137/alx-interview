@@ -5,58 +5,42 @@ A script that reads stdin line by line and computes metrics.
 
 import sys
 
+#       27.59.104.166 - - [04/Oct/2019:21:15:54 +0000] "GET /users/login HTTP/1.1" 200 41716 "-" "okhttp/3.12.1"
+#       IP_ADDRESS - -    [DATETIME]                   "METHOD /users/login HTTP/1.1" STATUS_CODE 41716 "-" "okhttp/3.12.1"
+#input = '84.149.236.176 - [2023-05-02 11:50:07.575575] "GET /projects/260 HTTP/1.1" 500 28'
 
-if __name__ == "__main__":
-    # Define the list of possible status codes
-    possible_status_codes = [200, 301, 400, 401, 403, 404, 405, 500]
+def report(total_size, status_codes):
+    print(f"File size: {total_size}")
+    for k, v in sorted(status_codes.items()):
+        print(f"{k}: {v}")
 
-    # Initialize variables to store metrics
-    total_file_size = 0
-    status_code_counts = {code: 0 for code in possible_status_codes}
+def parseLogs():
+    count = 0
+    total_size = 0
+    status_codes = {}
 
-
-    def print_statistics():
-        """Print the current statistics."""
-        print(f"File size: {total_file_size}")
-        for code in sorted(status_code_counts.keys()):
-            count = status_code_counts[code]
-            if count > 0:
-                print(f"{code}: {count}")
-
+    codes = {'200', '301', '400', '401', '402', '403', '404', '405', '500'}
 
     try:
-        # Loop through stdin line by line
-        for i, line in enumerate(sys.stdin, 1):
-            # Split the line into components
-            components = line.strip().split()
-
-            # Check if the line has the expected number of components
-            if len(components) != 7:
-                # Skip the line if it doesn't match the expected format
-                continue
-
-            # Extract the components
-            ip_address = components[0]
-            date = components[3][1:]
-            status_code = components[5]
-            file_size = components[6]
-
-            # Check if the status code is an integer and in the list of
-            # possible status codes
-            if (not status_code.isdigit() or int(status_code)
-                    not in possible_status_codes):
-                # Skip the line if the status code is not valid
-                continue
-
-            # Update metrics
-            total_file_size += int(file_size)
-            status_code_counts[int(status_code)] += 1
-
-            # Print statistics after every 10 lines
-            if i % 10 == 0:
-                print_statistics()
-
-    except KeyboardInterrupt:
-        # Print final statistics on keyboard interruption
-        print_statistics()
+        for line in sys.stdin:
+            count += 1
+            line = line.split()
+            try:
+                total_size += int(line[-1])
+                if line[-2] in codes:
+                    try:
+                        status_codes[line[-2]] += 1
+                    except KeyError:
+                        status_codes[line[-2]] = 1
+            except (IndexError, ValueError):
+                pass
+            if count == 10:
+                report(total_size, status_codes)
+                count = 0
+        report(total_size, status_codes)
+    except KeyboardInterrupt as e:
+        report(total_size, status_codes)
         raise
+
+if __name__ == "__main__":
+    parseLogs()
