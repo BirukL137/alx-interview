@@ -6,14 +6,16 @@ A script that reads stdin line by line and computes metrics.
 import sys
 
 
+def display(total_size, status_codes):
+    """
+    A method that displays sorted status.
+    """
+    print(f"File size: {total_size}")
+    for k, v in sorted(status_codes.items()):
+        print(f"{k}: {v}")
+
+
 if __name__ == "__main__":
-    def display(total_size, status_codes):
-        """
-        A method that displays sorted status.
-        """
-        print(f"File size: {total_size}")
-        for k, v in sorted(status_codes.items()):
-            print(f"{k}: {v}")
 
     def parse_status():
         """
