@@ -5,16 +5,17 @@ A script that reads stdin line by line and computes metrics.
 
 import sys
 
-#       27.59.104.166 - - [04/Oct/2019:21:15:54 +0000] "GET /users/login HTTP/1.1" 200 41716 "-" "okhttp/3.12.1"
-#       IP_ADDRESS - -    [DATETIME]                   "METHOD /users/login HTTP/1.1" STATUS_CODE 41716 "-" "okhttp/3.12.1"
-#input = '84.149.236.176 - [2023-05-02 11:50:07.575575] "GET /projects/260 HTTP/1.1" 500 28'
 
-def report(total_size, status_codes):
+def display_status(total_size, status_codes):
+    """
+    Displays the sorted status.
+    """
     print(f"File size: {total_size}")
     for k, v in sorted(status_codes.items()):
         print(f"{k}: {v}")
 
-def parseLogs():
+
+if __name__ == "__main__":
     count = 0
     total_size = 0
     status_codes = {}
@@ -35,12 +36,9 @@ def parseLogs():
             except (IndexError, ValueError):
                 pass
             if count == 10:
-                report(total_size, status_codes)
+                display_status(total_size, status_codes)
                 count = 0
-        report(total_size, status_codes)
+        display_status(total_size, status_codes)
     except KeyboardInterrupt as e:
-        report(total_size, status_codes)
+        display_status(total_size, status_codes)
         raise
-
-if __name__ == "__main__":
-    parseLogs()
