@@ -6,46 +6,40 @@ A script that reads stdin line by line and computes metrics.
 import sys
 
 
-def display(total_size, status_codes):
-    """
-    A method that displays sorted status.
-    """
-    print(f"File size: {total_size}")
-    for k, v in sorted(status_codes.items()):
-        print(f"{k}: {v}")
-
-
-def parse_status():
-    """
-    A method that reads and take data.
-    """
-    count = 0
+if __name__ == "__main__":
+    codes = {'200: 0', '301: 0', '400: 0', '401: 0', '402: 0', '403: 0',
+             '404: 0', '405: 0', '500: 0'}
+    count = 1
     total_size = 0
-    status_codes = {}
 
-    codes = {'200', '301', '400', '401', '402', '403', '404', '405', '500'}
+    def display():
+        """
+        A method that displays sorted status.
+        """
+        print(f"File size: {total_size}")
+        for k in sorted(codes.keys()):
+            if codes[k]:
+                print(f"{k}: {codes[k]}")
+
+
+    def parse(line):
+        """ Read, parse and grab data"""
+        try:
+            parsed_line = line.split()
+            status_code = parsed_line[-2]
+            if status_code in codes.keys():
+                codes[status_code] += 1
+            return int(parsed_line[-1])
+        except Exception:
+            return 0
 
     try:
-        for line in sys.stdin:
+        for i in sys.stdin:
+            total_size += parse(i)
+            if count % 10 == 0:
+                display()
             count += 1
-            line = line.split()
-            try:
-                total_size += int(line[-1])
-                if line[-2] in codes:
-                    try:
-                        status_codes[line[-2]] += 1
-                    except KeyError:
-                        status_codes[line[-2]] = 1
-            except (IndexError, ValueError):
-                pass
-            if count == 10:
-                display(total_size, status_codes)
-                count = 0
-        display(total_size, status_codes)
-    except KeyboardInterrupt as e:
-        display(total_size, status_codes)
+    except KeyboardInterrupt:
+        display()
         raise
-
-
-if __name__ == "__main__":
-    parse_status()
+    display()
